@@ -21,5 +21,8 @@ spring:
     type: redis
     redis:
       time-to-live: 900000
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
+
   server:
     port: 8080

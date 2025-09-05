@@ -1,6 +1,7 @@
 package com.example.redis.controller;
 
 import com.example.redis.dto.PersonResponseDTO;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,12 +24,15 @@ public class PersonController {
         return ResponseEntity.ok(resPerson);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<PersonResponseDTO> getPerson(@PathVariable Long id) {
+    @GetMapping("/getPerson/{id}")
+    public ResponseEntity<PersonResponseDTO> getPersonById(@PathVariable Long id) throws JsonProcessingException {
         PersonResponseDTO person = personService.getPerson(id);
         return person != null
                 ? ResponseEntity.ok(person)
                 : ResponseEntity.notFound().build();
     }
+
+
+
 
 }

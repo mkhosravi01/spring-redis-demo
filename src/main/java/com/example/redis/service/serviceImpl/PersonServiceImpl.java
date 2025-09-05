@@ -2,32 +2,52 @@ package com.example.redis.service.serviceImpl;
 
 import com.example.redis.dto.PersonResponseDTO;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
-
 import com.example.redis.dto.PersonRequestDTO;
 import com.example.redis.entity.Person;
 import com.example.redis.repository.PersonRepository;
 import com.example.redis.service.PersonService;
-import org.springframework.cache.annotation.Cacheable;
+
+
+import java.util.concurrent.TimeUnit;
+
 
 @Service
 @RequiredArgsConstructor
 public class PersonServiceImpl implements PersonService {
     private final PersonRepository personRepository;
+    private final RedisTemplate<String, PersonResponseDTO> redisTemplate;
+    private static final String PERSON_KEY = "person:";
 
     public PersonResponseDTO createPerson(PersonRequestDTO personDTO) {
         Person personResponse = personRepository.save(toEntity(personDTO));
         return toDTO(personResponse);
     }
 
-    @Cacheable(value = "persons", key = "#id")
+
+    @SneakyThrows
     public PersonResponseDTO getPerson(Long id) {
-        System.out.println("Fetching from DB...");
-        Person person = personRepository.findById(id).orElse(null);
-        if (person == null) {
-            return null;
+
+
+        String key = PERSON_KEY + id;
+        PersonResponseDTO personDTO = redisTemplate.opsForValue().get(key);
+        if (personDTO != null) {
+            personDTO = redisTemplate.opsForValue().get(key);
+            Long ttl = redisTemplate.getExpire(key, TimeUnit.SECONDS);
+            System.out.println("time to live: " + ttl);
+            System.out.println("Fetching from REDIS...");
+            Thread.sleep(5000);
+        }else{
+            System.out.println("Fetching from DB...");
+            Person person = personRepository.findById(id).orElse(null);
+            personDTO = person == null ? null : toDTO(person);
+            redisTemplate.opsForValue().set(key, personDTO);
+            redisTemplate.expire(key, 900, TimeUnit.SECONDS);
         }
-        return toDTO(person);
+
+        return personDTO;
     }
 
     private Person toEntity(PersonRequestDTO personDTO) {
@@ -50,4 +70,5 @@ public class PersonServiceImpl implements PersonService {
                 .address(person.getAddress())
                 .interests(person.getInterests()).build();
     }
+
 }
