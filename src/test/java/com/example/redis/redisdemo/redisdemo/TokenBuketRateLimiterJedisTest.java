@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import redis.clients.jedis.Jedis;
 import java.util.concurrent.TimeUnit;
 
-public class FixedWindowRateLimiterJedisTest {
+public class TokenBuketRateLimiterJedisTest {
     private  static RedisContainer redisContainer;
     private Jedis jedis;
     private TokenBucketRateLimiter tokenBucketRateLimiter;
