@@ -1,3 +1,5 @@
+package com.example.redis.redisdemo.redisdemo;
+
 import com.example.redis.jedis.FixedWindowRateLimiter;
 import com.redis.testcontainers.RedisContainer;
 import org.assertj.core.api.Assertions;
