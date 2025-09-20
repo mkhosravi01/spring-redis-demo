@@ -1,5 +1,5 @@
 package com.example.redis.service;
 
-public interface MessagePublisherr {
+public interface MessagePublisher {
     void publish(String message);
 }
